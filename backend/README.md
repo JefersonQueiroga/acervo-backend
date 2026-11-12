@@ -6,6 +6,8 @@ API em FastAPI do Acervo IF, o repositório de TCCs e Projetos Integradores do I
 
 ## Como rodar
 
+> **Está no Windows?** Siga o passo a passo completo em [COMO-RODAR-NO-WINDOWS.md](COMO-RODAR-NO-WINDOWS.md), que também tem a solução para os erros mais comuns.
+
 Na pasta `backend/`:
 
 ```bash

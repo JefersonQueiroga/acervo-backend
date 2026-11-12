@@ -10,6 +10,8 @@ Repositório on-line de TCCs e Projetos Integradores dos alunos do IFRN Campus P
 | [`backend/`](backend/) | A API do Acervo IF, que começa como uma cópia do kit e cresce etapa por etapa |
 | [`docs/requisitos-backend.md`](docs/requisitos-backend.md) | Os requisitos completos e o cronograma das etapas |
 
+Para rodar a API no Windows, siga o [passo a passo para Windows](backend/COMO-RODAR-NO-WINDOWS.md).
+
 ## Etapas
 
 Cada etapa concluída tem um commit e uma tag (`etapa-0`, `etapa-1`, ...). Para ver o código como estava numa etapa:
