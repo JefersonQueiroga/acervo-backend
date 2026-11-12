@@ -48,12 +48,6 @@ Deu certo quando aparece `(venv)` no começo da linha:
 (venv) PS C:\...\backend>
 ```
 
-**Apareceu um erro vermelho dizendo que "a execução de scripts foi desabilitada neste sistema"?** É uma proteção do Windows. Rode este comando e depois ative de novo:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-venv\Scripts\activate
-```
 
 O `-Scope Process` vale só para esta janela do PowerShell. Quando você fechar a janela, tudo volta ao normal. Por isso o comando precisa ser repetido toda vez que você abrir um terminal novo.
 
