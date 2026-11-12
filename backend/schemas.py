@@ -32,6 +32,7 @@ class ProjetoRead(BaseModel):
     link_repositorio: str | None
     link_demo: str | None
     aberto_para_continuar: bool  # no banco é 0 ou 1; o Pydantic converte
+    usuario_id: int  # o dono do projeto (vem do token, nunca do corpo)
 
 
 # O que o aluno manda para criar a conta
@@ -48,3 +49,15 @@ class UsuarioRead(BaseModel):
     nome: str
     email: str
     curso: str
+
+
+# Login em JSON
+class LoginDados(BaseModel):
+    email: str
+    senha: str
+
+
+# O que o login devolve
+class Token(BaseModel):
+    access_token: str
+    token_type: str

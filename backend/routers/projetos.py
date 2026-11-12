@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from database import get_db
 from schemas import ProjetoCreate, ProjetoRead
+from seguranca import get_usuario_atual
 
 router = APIRouter(prefix="/projetos", tags=["projetos"])
 
@@ -53,12 +54,24 @@ def detalhar_projeto(id: int, db: Connection = Depends(get_db)):
     return buscar_projeto(id, db)
 
 
+def conferir_dono(projeto: dict, usuario: dict):
+    # RN07: só o dono edita ou exclui
+    if projeto["usuario_id"] != usuario["id"]:
+        raise HTTPException(status_code=403, detail="Você não é o dono deste projeto")
+
+
 @router.post("", response_model=ProjetoRead, status_code=201)
-def cadastrar_projeto(projeto: ProjetoCreate, db: Connection = Depends(get_db)):
+def cadastrar_projeto(
+    projeto: ProjetoCreate,
+    db: Connection = Depends(get_db),
+    usuario: dict = Depends(get_usuario_atual),
+):
+    # RN09: o dono vem do token (usuario["id"]), nunca do corpo
     cursor = db.execute(
         """INSERT INTO projetos (titulo, resumo, tipo, curso, ano, autores, orientador,
-               palavras_chave, link_repositorio, link_demo, aberto_para_continuar)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               palavras_chave, link_repositorio, link_demo, aberto_para_continuar,
+               usuario_id)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             projeto.titulo,
             projeto.resumo,
@@ -71,6 +84,7 @@ def cadastrar_projeto(projeto: ProjetoCreate, db: Connection = Depends(get_db)):
             projeto.link_repositorio,
             projeto.link_demo,
             projeto.aberto_para_continuar,
+            usuario["id"],
         ),
     )
     db.commit()
@@ -78,8 +92,14 @@ def cadastrar_projeto(projeto: ProjetoCreate, db: Connection = Depends(get_db)):
 
 
 @router.put("/{id}", response_model=ProjetoRead)
-def editar_projeto(id: int, projeto: ProjetoCreate, db: Connection = Depends(get_db)):
-    buscar_projeto(id, db)  # 404 se não existe
+def editar_projeto(
+    id: int,
+    projeto: ProjetoCreate,
+    db: Connection = Depends(get_db),
+    usuario: dict = Depends(get_usuario_atual),
+):
+    existente = buscar_projeto(id, db)  # 404 se não existe
+    conferir_dono(existente, usuario)  # 403 se não é o dono
     db.execute(
         """UPDATE projetos SET titulo = ?, resumo = ?, tipo = ?, curso = ?, ano = ?,
                autores = ?, orientador = ?, palavras_chave = ?, link_repositorio = ?,
@@ -105,7 +125,12 @@ def editar_projeto(id: int, projeto: ProjetoCreate, db: Connection = Depends(get
 
 
 @router.delete("/{id}", status_code=204)
-def excluir_projeto(id: int, db: Connection = Depends(get_db)):
-    buscar_projeto(id, db)  # 404 se não existe
+def excluir_projeto(
+    id: int,
+    db: Connection = Depends(get_db),
+    usuario: dict = Depends(get_usuario_atual),
+):
+    existente = buscar_projeto(id, db)  # 404 se não existe
+    conferir_dono(existente, usuario)  # 403 se não é o dono
     db.execute("DELETE FROM projetos WHERE id = ?", (id,))
     db.commit()

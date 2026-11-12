@@ -36,7 +36,8 @@ def criar_tabelas():
             palavras_chave TEXT NOT NULL DEFAULT '',
             link_repositorio TEXT,
             link_demo TEXT,
-            aberto_para_continuar INTEGER NOT NULL DEFAULT 0
+            aberto_para_continuar INTEGER NOT NULL DEFAULT 0,
+            usuario_id INTEGER NOT NULL REFERENCES usuarios(id)
         )
     """)
 

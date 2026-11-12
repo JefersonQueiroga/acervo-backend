@@ -1,15 +1,22 @@
 import os
 
 from database import ARQUIVO_BANCO, conectar, criar_tabelas
+from seguranca import gerar_hash
 
 # Começa do zero: apaga o banco antigo e cria as tabelas de novo
 if os.path.exists(ARQUIVO_BANCO):
     os.remove(ARQUIVO_BANCO)
 criar_tabelas()
 
-# Todos os nomes são fictícios.
+# Todos os nomes são fictícios. A senha dos dois é "senha123".
+# A Ana fica com o id 1 e o Bruno com o id 2.
+usuarios = [
+    ("Ana Lívia Rocha", "ana@exemplo.com", gerar_hash("senha123"), "Informática"),
+    ("Bruno Henrique Dantas", "bruno@exemplo.com", gerar_hash("senha123"), "ADS"),
+]
+
 # Ordem das colunas: titulo, resumo, tipo, curso, ano, autores, orientador,
-# palavras_chave, link_repositorio, link_demo, aberto_para_continuar
+# palavras_chave, link_repositorio, link_demo, aberto_para_continuar, usuario_id
 projetos = [
     (
         "BiblioAgenda: agendamento de salas de estudo da biblioteca",
@@ -18,7 +25,7 @@ projetos = [
         "Ana Lívia Rocha, Bruno Henrique Dantas e Carla Nunes",
         "Marcos Vinícius Fernandes",
         "biblioteca, agendamento, reservas",
-        "https://github.com/exemplo/biblioagenda", None, 1,
+        "https://github.com/exemplo/biblioagenda", None, 1, 1,
     ),
     (
         "Carona IF: caronas solidárias para o campus",
@@ -27,7 +34,7 @@ projetos = [
         "Diego Alencar Souza",
         "Patrícia Lima Carvalho",
         "caronas, mobilidade, transporte",
-        "https://github.com/exemplo/carona-if", "https://carona-if.exemplo.com", 1,
+        "https://github.com/exemplo/carona-if", "https://carona-if.exemplo.com", 1, 2,
     ),
     (
         "Estoque Fácil: controle de estoque para mercearias de bairro",
@@ -36,7 +43,7 @@ projetos = [
         "Elisa Gomes, Fábio Medeiros e Gabriel Freitas",
         "Marcos Vinícius Fernandes",
         "estoque, comércio local, vendas",
-        "https://github.com/exemplo/estoque-facil", None, 0,
+        "https://github.com/exemplo/estoque-facil", None, 0, 1,
     ),
     (
         "Feira Viva: vitrine on-line para a feira livre de Pau dos Ferros",
@@ -45,7 +52,7 @@ projetos = [
         "Helena Maia Bezerra",
         "Ricardo Augusto Queiroz",
         "feira, agricultura familiar, pedidos",
-        "https://github.com/exemplo/feira-viva", "https://feiraviva.exemplo.com", 0,
+        "https://github.com/exemplo/feira-viva", "https://feiraviva.exemplo.com", 0, 2,
     ),
     (
         "Merenda em Dia: cardápio e avaliação da merenda escolar",
@@ -54,7 +61,7 @@ projetos = [
         "Igor Lucena, Júlia Torres e Kauã Pinheiro",
         "Patrícia Lima Carvalho",
         "merenda, refeitório, avaliação",
-        None, None, 1,
+        None, None, 1, 1,
     ),
     (
         "AquaSertão: monitoramento do nível de cisternas com Arduino",
@@ -63,7 +70,7 @@ projetos = [
         "Larissa Fontes de Oliveira",
         "Ricardo Augusto Queiroz",
         "cisternas, arduino, internet das coisas, seca",
-        "https://github.com/exemplo/aquasertao", None, 0,
+        "https://github.com/exemplo/aquasertao", None, 0, 2,
     ),
     (
         "Achados IF: achados e perdidos do campus",
@@ -72,7 +79,7 @@ projetos = [
         "Mateus Rebouças e Natália Sales",
         "Marcos Vinícius Fernandes",
         "achados e perdidos, campus, mural",
-        "https://github.com/exemplo/achados-if", "https://achados-if.exemplo.com", 0,
+        "https://github.com/exemplo/achados-if", "https://achados-if.exemplo.com", 0, 1,
     ),
     (
         "Horta Escolar Digital: registro de plantio e colheita",
@@ -81,19 +88,28 @@ projetos = [
         "Otávio Cavalcante Lima",
         "Patrícia Lima Carvalho",
         "horta, escolas, agricultura",
-        None, None, 0,
+        None, None, 0, 2,
     ),
 ]
 
 conexao = conectar()
+for usuario in usuarios:
+    conexao.execute(
+        "INSERT INTO usuarios (nome, email, senha_hash, curso) VALUES (?, ?, ?, ?)",
+        usuario,
+    )
 for projeto in projetos:
     conexao.execute(
         """INSERT INTO projetos (titulo, resumo, tipo, curso, ano, autores, orientador,
-               palavras_chave, link_repositorio, link_demo, aberto_para_continuar)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               palavras_chave, link_repositorio, link_demo, aberto_para_continuar,
+               usuario_id)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         projeto,
     )
 conexao.commit()
 conexao.close()
 
-print(f"Banco {ARQUIVO_BANCO} criado com {len(projetos)} projetos.")
+print(
+    f"Banco {ARQUIVO_BANCO} criado com {len(usuarios)} usuários "
+    f"e {len(projetos)} projetos."
+)

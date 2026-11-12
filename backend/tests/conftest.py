@@ -13,6 +13,27 @@ def cliente(tmp_path, monkeypatch):
     return TestClient(app)
 
 
+def entrar(cliente, email):
+    """Cria a conta, faz o login e devolve o cabeçalho com o token."""
+    cliente.post(
+        "/auth/cadastro",
+        json={"nome": "Teste", "email": email, "senha": "senha123", "curso": "ADS"},
+    )
+    resposta = cliente.post("/auth/login", json={"email": email, "senha": "senha123"})
+    token = resposta.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def ana(cliente):
+    return entrar(cliente, "ana@exemplo.com")
+
+
+@pytest.fixture
+def bruno(cliente):
+    return entrar(cliente, "bruno@exemplo.com")
+
+
 def projeto_exemplo(**mudancas):
     projeto = {
         "titulo": "Agenda da biblioteca",

@@ -48,7 +48,7 @@ def get_usuario_atual(
     except (jwt.InvalidTokenError, KeyError, ValueError):
         raise erro
     linha = db.execute(
-        "SELECT id, nome, email FROM usuarios WHERE id = ?", (usuario_id,)
+        "SELECT id, nome, email, curso FROM usuarios WHERE id = ?", (usuario_id,)
     ).fetchone()
     if linha is None:
         raise erro
