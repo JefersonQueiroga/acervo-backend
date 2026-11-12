@@ -2,7 +2,7 @@
 
 API em FastAPI do Acervo IF, o repositório de TCCs e Projetos Integradores do IFRN Campus Pau dos Ferros. Começou como uma cópia do [`kit-alunos/`](../kit-alunos/) e cresce uma etapa por vez. Os requisitos estão em [`docs/requisitos-backend.md`](../docs/requisitos-backend.md).
 
-**Etapa atual: 1 (CRUD de projetos).** Ainda não tem login: todas as rotas são públicas.
+**Etapa atual: 2 (cadastro com senha).** Já dá para criar conta, mas ainda não tem login: todas as rotas de projetos continuam públicas.
 
 ## Como rodar
 
@@ -30,9 +30,10 @@ pytest
 |---|---|
 | `main.py` | Cria o app, liga o CORS, cria as tabelas e inclui os routers |
 | `database.py` | `conectar()`, `criar_tabelas()` e `get_db()`. O banco é o `acervo.db` |
-| `seguranca.py` | Hash de senha e JWT. Veio pronto do kit e só vai ser usado a partir da etapa 2 |
-| `schemas.py` | `ProjetoCreate` (entrada) e `ProjetoRead` (saída) |
+| `seguranca.py` | Hash de senha e JWT. Veio pronto do kit. Por enquanto só o `gerar_hash` é usado |
+| `schemas.py` | `ProjetoCreate` e `ProjetoRead`, `UsuarioCreate` e `UsuarioRead` |
 | `routers/projetos.py` | As 5 rotas de projetos e os filtros |
+| `routers/auth.py` | O cadastro de usuário |
 | `seed.py` | Recria o banco com os dados de exemplo |
 | `tests/` | Testes com pytest |
 
@@ -77,6 +78,27 @@ Todos são opcionais e podem ser combinados. O SQL é sempre o mesmo (`SELECT * 
 ```
 
 `tipo` aceita só `TCC` ou `PI`, `curso` só `Informática` ou `ADS`, e `ano` vai de 2000 a 2100. Fora disso, a resposta é 422.
+
+## Cadastro de usuário
+
+`POST /auth/cadastro` cria a conta e responde 201 com `id`, `nome`, `email` e `curso`. A resposta **nunca** traz a senha nem o hash.
+
+```json
+{
+  "nome": "Ana Lívia",
+  "email": "ana@exemplo.com",
+  "senha": "senha123",
+  "curso": "Informática"
+}
+```
+
+| Regra | O que acontece |
+|---|---|
+| RN01: o e-mail é único | E-mail repetido dá 409 `"E-mail já cadastrado"` |
+| RN02: a senha tem no mínimo 6 caracteres | Senha curta dá 422 (quem responde é o Pydantic) |
+| RN03: a senha é guardada só como hash | A rota grava `gerar_hash(senha)` na coluna `senha_hash`, que começa com `$2b$` |
+
+O 409 é feito com um `SELECT` antes do `INSERT`: se já existe um usuário com aquele e-mail, a rota levanta o `HTTPException`.
 
 ## Mudou uma coluna?
 

@@ -18,7 +18,8 @@ def criar_tabelas():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
-            senha_hash TEXT NOT NULL
+            senha_hash TEXT NOT NULL,
+            curso TEXT NOT NULL
         )
     """)
 

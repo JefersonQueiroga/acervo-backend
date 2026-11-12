@@ -32,3 +32,19 @@ class ProjetoRead(BaseModel):
     link_repositorio: str | None
     link_demo: str | None
     aberto_para_continuar: bool  # no banco é 0 ou 1; o Pydantic converte
+
+
+# O que o aluno manda para criar a conta
+class UsuarioCreate(BaseModel):
+    nome: str
+    email: str
+    senha: str = Field(min_length=6)
+    curso: Literal["Informática", "ADS"]
+
+
+# O que a API devolve: nunca a senha nem o hash
+class UsuarioRead(BaseModel):
+    id: int
+    nome: str
+    email: str
+    curso: str

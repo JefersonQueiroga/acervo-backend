@@ -22,7 +22,7 @@ git checkout etapa-1
 |---|---|
 | 0. Kit dos alunos | pronta |
 | 1. CRUD de projetos | pronta |
-| 2. Cadastro com senha | — |
+| 2. Cadastro com senha | pronta |
 | 3. Login e rotas protegidas | — |
 | 4. Comentários | — |
 | 5. Deploy | — |
