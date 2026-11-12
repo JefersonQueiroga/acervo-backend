@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import criar_tabelas
-from routers import auth, meus_projetos, projetos
+from routers import auth, comentarios, meus_projetos, projetos
 
 load_dotenv()
 
@@ -26,3 +26,4 @@ criar_tabelas()
 app.include_router(auth.router)
 app.include_router(projetos.router)
 app.include_router(meus_projetos.router)
+app.include_router(comentarios.router)

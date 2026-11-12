@@ -61,3 +61,17 @@ class LoginDados(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+# O que o cliente manda para comentar (o projeto vem da URL e o autor, do token)
+class ComentarioCreate(BaseModel):
+    texto: str = Field(min_length=1)
+
+
+# O que a API devolve
+class ComentarioRead(BaseModel):
+    id: int
+    texto: str
+    data: str  # o banco preenche sozinho, no formato "AAAA-MM-DD"
+    projeto_id: int
+    usuario_id: int

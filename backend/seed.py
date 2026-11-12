@@ -92,6 +92,13 @@ projetos = [
     ),
 ]
 
+# Ordem das colunas: texto, projeto_id, usuario_id (a data o banco preenche)
+comentarios = [
+    ("Muito útil! Dá para avisar também pelo WhatsApp quando a reserva for confirmada?", 1, 2),
+    ("Tenho interesse em continuar, principalmente na parte do mapa das rotas.", 2, 1),
+    ("Seria legal mostrar a média das avaliações por semana.", 5, 2),
+]
+
 conexao = conectar()
 for usuario in usuarios:
     conexao.execute(
@@ -106,10 +113,15 @@ for projeto in projetos:
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         projeto,
     )
+for comentario in comentarios:
+    conexao.execute(
+        "INSERT INTO comentarios (texto, projeto_id, usuario_id) VALUES (?, ?, ?)",
+        comentario,
+    )
 conexao.commit()
 conexao.close()
 
 print(
-    f"Banco {ARQUIVO_BANCO} criado com {len(usuarios)} usuários "
-    f"e {len(projetos)} projetos."
+    f"Banco {ARQUIVO_BANCO} criado com {len(usuarios)} usuários, "
+    f"{len(projetos)} projetos e {len(comentarios)} comentários."
 )

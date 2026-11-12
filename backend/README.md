@@ -2,7 +2,7 @@
 
 API em FastAPI do Acervo IF, o repositório de TCCs e Projetos Integradores do IFRN Campus Pau dos Ferros. Começou como uma cópia do [`kit-alunos/`](../kit-alunos/) e cresce uma etapa por vez. Os requisitos estão em [`docs/requisitos-backend.md`](../docs/requisitos-backend.md).
 
-**Etapa atual: 3 (login e rotas protegidas).** Qualquer pessoa lista e lê os projetos. Para cadastrar é preciso estar logado, e só o dono edita ou exclui.
+**Etapa atual: 4 (comentários).** Qualquer pessoa lista e lê os projetos e os comentários. Para cadastrar um projeto ou comentar é preciso estar logado; só o dono edita ou exclui o projeto, e só o autor apaga o comentário.
 
 ## Como rodar
 
@@ -23,7 +23,7 @@ Abra http://127.0.0.1:8000/docs. O `seed.py` apaga o `acervo.db` e cria:
 | `ana@exemplo.com` | `senha123` | Informática | os 4 PIs de Informática |
 | `bruno@exemplo.com` | `senha123` | ADS | os 4 TCCs de ADS |
 
-São 8 projetos ao todo, 3 deles abertos para continuação.
+São 8 projetos ao todo, 3 deles abertos para continuação, e 3 comentários.
 
 Para rodar os testes, que usam um banco temporário e não mexem no `acervo.db`:
 
@@ -38,9 +38,10 @@ pytest
 | `main.py` | Cria o app, liga o CORS, cria as tabelas e inclui os routers |
 | `database.py` | `conectar()`, `criar_tabelas()` e `get_db()`. O banco é o `acervo.db` |
 | `seguranca.py` | Hash de senha e JWT. Veio pronto do kit; a única mudança é que o `get_usuario_atual` devolve também o `curso` |
-| `schemas.py` | `ProjetoCreate`, `ProjetoRead`, `UsuarioCreate`, `UsuarioRead`, `LoginDados` e `Token` |
+| `schemas.py` | Os pares `Create`/`Read` de projeto, usuário e comentário, mais `LoginDados` e `Token` |
 | `routers/projetos.py` | As 5 rotas de projetos, os filtros e a checagem do dono |
 | `routers/meus_projetos.py` | Os projetos do usuário logado |
+| `routers/comentarios.py` | Listar, comentar e apagar comentário. Não tem `prefix`, porque as rotas começam ora com `/projetos`, ora com `/comentarios` |
 | `routers/auth.py` | Cadastro, login e "quem sou eu" |
 | `seed.py` | Recria o banco com os dados de exemplo |
 | `tests/` | Testes com pytest |
@@ -53,7 +54,10 @@ pytest
 | `GET /projetos/{id}` | público | 200 | Detalhe do projeto (404 se não existe) |
 | `POST /projetos` | login | 201 | Cadastra um projeto. O dono é quem está logado |
 | `PUT /projetos/{id}` | login + dono | 200 | Edita um projeto |
-| `DELETE /projetos/{id}` | login + dono | 204 | Exclui um projeto |
+| `DELETE /projetos/{id}` | login + dono | 204 | Exclui um projeto e os comentários dele |
+| `GET /projetos/{id}/comentarios` | público | 200 | Comentários do projeto, do mais antigo para o mais novo |
+| `POST /projetos/{id}/comentarios` | login | 201 | Comenta no projeto. O corpo é só `{"texto": "..."}` |
+| `DELETE /comentarios/{id}` | login + autor | 204 | Apaga o próprio comentário |
 | `GET /meus-projetos` | login | 200 | Só os projetos do usuário logado |
 | `POST /auth/cadastro` | público | 201 | Cria a conta |
 | `POST /auth/login` | público | 200 | Confere e-mail e senha e devolve o token |
@@ -129,7 +133,10 @@ O token vale por 60 minutos.
 | RN05: o token expira | Depois de 60 minutos (`EXPIRA_MINUTOS`), dá 401 |
 | RN06: rota protegida precisa de token | Sem token, ou com token inválido, dá 401 `"Não autenticado"` |
 | RN07: só o dono edita ou exclui | Outro usuário recebe 403 `"Você não é o dono deste projeto"` |
-| RN09: o dono vem do token | O `INSERT` grava `usuario["id"]`, nunca um valor do corpo |
+| RN08: só o autor apaga o comentário | Outro usuário recebe 403 `"Você não é o autor deste comentário"` |
+| RN09: o dono vem do token | O `INSERT` de projeto e o de comentário gravam `usuario["id"]`, nunca um valor do corpo |
+| RN10: excluir o projeto apaga os comentários | A rota roda `DELETE FROM comentarios WHERE projeto_id = ?` antes de apagar o projeto. Sem isso, o `REFERENCES` impede o `DELETE` |
+| RN11: comentar em projeto que não existe | 404 `"Projeto não encontrado"` |
 
 ## Mudou uma coluna?
 

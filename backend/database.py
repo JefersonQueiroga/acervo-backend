@@ -41,6 +41,16 @@ def criar_tabelas():
         )
     """)
 
+    conexao.execute("""
+        CREATE TABLE IF NOT EXISTS comentarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            texto TEXT NOT NULL,
+            data TEXT NOT NULL DEFAULT (date('now')),
+            projeto_id INTEGER NOT NULL REFERENCES projetos(id),
+            usuario_id INTEGER NOT NULL REFERENCES usuarios(id)
+        )
+    """)
+
     conexao.commit()
     conexao.close()
 

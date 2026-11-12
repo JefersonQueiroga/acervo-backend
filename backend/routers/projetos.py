@@ -132,5 +132,7 @@ def excluir_projeto(
 ):
     existente = buscar_projeto(id, db)  # 404 se não existe
     conferir_dono(existente, usuario)  # 403 se não é o dono
+    # RN10: apaga antes os comentários, senão o REFERENCES impede o DELETE
+    db.execute("DELETE FROM comentarios WHERE projeto_id = ?", (id,))
     db.execute("DELETE FROM projetos WHERE id = ?", (id,))
     db.commit()

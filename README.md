@@ -24,5 +24,5 @@ git checkout etapa-1
 | 1. CRUD de projetos | pronta |
 | 2. Cadastro com senha | pronta |
 | 3. Login e rotas protegidas | pronta |
-| 4. Comentários | — |
+| 4. Comentários | pronta |
 | 5. Deploy | — |
