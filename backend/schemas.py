@@ -1,0 +1,34 @@
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+
+# O que o cliente manda para cadastrar ou editar um projeto
+class ProjetoCreate(BaseModel):
+    titulo: str
+    resumo: str
+    tipo: Literal["TCC", "PI"]
+    curso: Literal["Informática", "ADS"]
+    ano: int = Field(ge=2000, le=2100)
+    autores: str
+    orientador: str
+    palavras_chave: str = ""
+    link_repositorio: str | None = None
+    link_demo: str | None = None
+    aberto_para_continuar: bool = False
+
+
+# O que a API devolve (com o id)
+class ProjetoRead(BaseModel):
+    id: int
+    titulo: str
+    resumo: str
+    tipo: str
+    curso: str
+    ano: int
+    autores: str
+    orientador: str
+    palavras_chave: str
+    link_repositorio: str | None
+    link_demo: str | None
+    aberto_para_continuar: bool  # no banco é 0 ou 1; o Pydantic converte
