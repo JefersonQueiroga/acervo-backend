@@ -1,0 +1,5 @@
+fastapi==0.162.5
+uvicorn==0.54.0
+bcrypt==5.0.0
+pyjwt==2.15.1
+python-dotenv==1.2.4
